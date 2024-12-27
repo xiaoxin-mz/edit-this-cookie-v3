@@ -315,39 +315,41 @@ async function start() {
             }
         }
 
-    try {
-      var cookieArray = $.parseJSON(text);
-      if (Object.prototype.toString.apply(cookieArray) === '[object Object]') cookieArray = [cookieArray];
-      for (var i = 0; i < cookieArray.length; i++) {
         try {
-          var cJSON = cookieArray[i];
-          var cookie = cookieForCreationFromFullCookie(cJSON);
-          chrome.cookies.set(cookie);
-          nCookiesImportedThisTime++;
+          var cookieArray = $.parseJSON(text);
+          if (Object.prototype.toString.apply(cookieArray) === '[object Object]') cookieArray = [cookieArray];
+          for (var i = 0; i < cookieArray.length; i++) {
+            try {
+              var cJSON = cookieArray[i];
+              var cookie = cookieForCreationFromFullCookie(cJSON);
+              chrome.cookies.set(cookie);
+              nCookiesImportedThisTime++;
+            } catch (e) {
+              error.html(
+                error.html() +
+                  '<br>' +
+                  $('<div/>')
+                    .text('Cookie number ' + i)
+                    .html() +
+                  '<br>' +
+                  $('<div/>').text(e.message).html(),
+              );
+              console.error(e.message);
+              error.fadeIn();
+              return;
+            }
+          }
         } catch (e) {
-          error.html(
-            error.html() +
-              '<br>' +
-              $('<div/>')
-                .text('Cookie number ' + i)
-                .html() +
-              '<br>' +
-              $('<div/>').text(e.message).html(),
-          );
+          error.html(error.html() + '<br>' + $('<div/>').text(e.message).html());
           console.error(e.message);
           error.fadeIn();
           return;
         }
-      }
-    } catch (e) {
-      error.html(error.html() + '<br>' + $('<div/>').text(e.message).html());
-      console.error(e.message);
-      error.fadeIn();
-      return;
-    }
 
-    data.nCookiesImported += nCookiesImportedThisTime;
-    doSearch();
+      data.nCookiesImported += nCookiesImportedThisTime;
+      doSearch();
+    })
+    
     return;
   }
 
